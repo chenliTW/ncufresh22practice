@@ -1,0 +1,22 @@
+body {
+  background-color: rgb(0, 50, 78);
+}
+
+.mynav{
+  background-color: rgb(0, 106, 166);
+}
+
+.newpostcard{
+  background-color: #f2f2f2;
+  border-radius: 5px;
+  padding: 20px;
+  margin: 40px 10px;
+}
+
+.card{
+  background-color: #ffffff;
+  border-radius: 5px;
+  margin: 40px 10vw;
+  padding: 20px 75px;
+  border: 0px;
+}

@@ -1,0 +1,270 @@
+<script src="/sw/sweetalert2.all.min.js"></script>
+<script src="/javascripts/account.js"></script>
+<nav class="mynav navbar navbar-expand-lg navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">留言板(?</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarScroll"
+      aria-controls="navbarScroll"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <% if(username===''){ %>
+    <div class="collapse navbar-collapse" id="navbarScroll">
+      <ul
+        class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll"
+        style="--bs-scroll-height: 100px"
+      ></ul>
+      <div class="d-flex">
+        <button
+          class="btn btn-success me-2"
+          data-bs-toggle="modal"
+          data-bs-target="#loginmodal"
+        >
+          登入
+        </button>
+        <div
+          class="modal fade"
+          id="loginmodal"
+          data-bs-backdrop="static"
+          data-bs-keyboard="false"
+          tabindex="-1"
+          aria-labelledby="staticBackdropLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">登入</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label"
+                      >帳號名稱:</label
+                    >
+                    <input
+                      id="login_username"
+                      type="text"
+                      class="form-control"
+                      id="exampleInputEmail1"
+                      aria-describedby="emailHelp"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label"
+                      >密碼:</label
+                    >
+                    <input
+                      id="login_password"
+                      type="password"
+                      class="form-control"
+                      id="exampleInputPassword1"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3 form-check">
+                    <input
+                      id="login_robot"
+                      type="checkbox"
+                      class="form-check-input"
+                      id="exampleCheck1"
+                      required
+                    />
+                    <label class="form-check-label" for="exampleCheck1"
+                      >我不是機器人?</label
+                    >
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <center>
+                        <div
+                          class="alert alert-success"
+                          role="alert"
+                          id="login_success"
+                          hidden
+                        ></div>
+                        <div
+                          class="alert alert-danger"
+                          role="alert"
+                          id="login_danger"
+                          hidden
+                        ></div>
+                      </center>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <button
+                        type="button"
+                        onclick="login()"
+                        class="btn btn-primary"
+                        style="width: 100%"
+                      >
+                        登入
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#registermodal"
+        >
+          辦帳號
+        </button>
+        <div
+          class="modal fade"
+          id="registermodal"
+          data-bs-backdrop="static"
+          data-bs-keyboard="false"
+          tabindex="-1"
+          aria-labelledby="staticBackdropLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">辦帳號</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label"
+                      >帳號名稱:</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="reg_username"
+                      aria-describedby="emailHelp"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label"
+                      >密碼:</label
+                    >
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="reg_password"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label"
+                      >確認密碼:</label
+                    >
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="reg_password_chk"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3 form-check">
+                    <input
+                      id="reg_robot"
+                      type="checkbox"
+                      class="form-check-input"
+                      id="exampleCheck2"
+                      required
+                    />
+                    <label class="form-check-label" for="exampleCheck2"
+                      >我不是機器人</label
+                    >
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <center>
+                        <div
+                          class="alert alert-success"
+                          role="alert"
+                          id="reg_success"
+                          hidden
+                        ></div>
+                        <div
+                          class="alert alert-danger"
+                          role="alert"
+                          id="reg_danger"
+                          hidden
+                        ></div>
+                      </center>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <button
+                        id="reg_btn"
+                        type="button"
+                        onclick="register()"
+                        class="btn btn-primary"
+                        style="width: 100%"
+                      >
+                        註冊
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% }else{ %>
+    <div class="collapse navbar-collapse" id="navbarScroll">
+      <ul
+        class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll"
+        style="--bs-scroll-height: 100px"
+      ></ul>
+      <ul
+        class="navbar-nav me-4 my-2 my-lg-0 navbar-nav-scroll"
+        style="--bs-scroll-height: 100px"
+      >
+        <li class="nav-item">
+          <a class="nav-link" href="#">早安, <%= username %></a>
+        </li>
+      </ul>
+      <div class="d-flex me-3">
+        <button class="btn btn-primary" onclick="location.href='/new'">
+          新文章
+        </button>
+      </div>
+      <div class="d-flex me-2">
+        <button class="btn btn-secondary" onclick="location.href='/user'">
+          我的文章
+        </button>
+      </div>
+      <div class="d-flex">
+        <button onclick="location.href='/logout'" class="btn btn-danger">
+          登出
+        </button>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</nav>
