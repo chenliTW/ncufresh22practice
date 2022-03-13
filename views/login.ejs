@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>留言板</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-black" style="font-family:'細明體';">
+    <div>
+    <%- include('navbar.ejs') %>
+    </div>
+    <div class="relative top-60 flex text-white">
+        <form method="post" class="border-2 border-white w-80 m-auto">
+            <br>
+            <br>
+            <span class="ml-10">帳號：</span><input name="username" class="text-black" type="text" required>
+            <br>
+            <br>
+            <span class="ml-10">密碼：</span><input name="password" class="text-black" type="text" required>
+            <br>
+            <br>
+            <div class="flex">
+                <button class="m-auto border-1 bg-white text-black px-3">登入</button>
+            </div>
+            <br>
+        </form>
+    </div>
+    <br>
+    <% if(error!==''){ %>
+    <div class="relative top-60 text-center text-lg font-medium text-red-600">
+        <%= error %>
+    </div>
+    <% } %>
+  </body>
+</html>

@@ -3,68 +3,33 @@
   <head>
     <title>留言板</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/stylesheets/style.css" />
-    <script src="/js/bootstrap.min.js"></script>
-  </head>
-  <body>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+  <body class="bg-black" style="font-family:'細明體';">
     <%- include('navbar.ejs') %>
-    <main class="container-md">
-        <div class="card newpostcard">
-            <div class="card-body">
-                <h1 style="text-align: center;">新文章</h1>
-                <br>
-                <form method="post">
-                    <div class="row">
-                        <div class="col-2">
-                            <h3 style="text-align: center;">標題:</h3>
-                        </div>
-                        <div class="col-8">
-                            <input class="form-control" name="title">
-                        </div>
-                    </div><br>
-                    <div class="row">
-                        <div class="col-2">
-                            <h3 style="text-align: center;">內文:</h3>
-                        </div>
-                        <div class="col-8">
-                            <textarea rows="7"  class="form-control" name="body"></textarea>
-                        </div>
-                    </div><br>
-                    <div class="row">
-                        <div class="col-2">
-                            <h3 style="text-align: center;">圖片:</h3>
-                        </div>
-                        <div class="col-8">
-                        <div class="input-group mb-3">
-                            <input onchange="getBase64(document.getElementById('img').files[0])"  type="file" class="form-control" id="img" accept="image/*">
-                            <input type="hidden" id="fileb64" name="image" value="">
-                        </div>
-                    </div>
-                    </div>
-                    <center>
-                    <div class="row">
-                        <div class="col-2"></div>
-                        <div class="col-8">
-                            <input type="checkbox" class="form-check-input" id="exampleCheck2" required>
-                            <label class="form-check-label" for="exampleCheck2">我不是機器人</label>
-                        </div>
-                    </div>
-                    <br>
-                    <button class="btn btn-primary" type="submit">發布</button>
-                    </center>
-                </form>
-            </div>
+    <div class="relative top-12 px-24 py-12">
+      <form method="post">
+        <div class="flex">
+          <div class="text-2xl text-white w-20 flex-initial">標題:</div>
+          <input class="bg-gray-300 text-2xl flex-1 mr-10" name="title" required></ipnut>
         </div>
-    </main>
+        <br>
+        <div class="flex">
+          <div class="text-2xl text-white w-20 flex-initial">內文:</div>
+          <textarea class="bg-gray-300 text-2xl flex-1 mr-10" name="body" rows="8"></textarea>
+        </div>
+        <br>
+        <div class="flex">
+          <div class="flex-1"></div>
+          <div class="m-auto">
+            <button class="bg-white text-black px-2 py-1" required>建立文章</button>
+          </div>
+          <div class="flex-1"></div>
+        </div>
+      </form>
+    </div>
   </body>
   <script>
-      function getBase64(file) {
-            var reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function () {
-                document.getElementById('fileb64').value = reader.result;
-            };
-        }
+      
   </script>
 </html>

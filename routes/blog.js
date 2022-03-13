@@ -15,9 +15,11 @@ var posts = new mongoose.Schema({
   title: String,
   body: String,
   image: String,
-  comments: [{index:Number, body: String, author: String, date: { type: Date, default: Date.now }, deleted: Boolean}],
+  ip: String,
+  comments: [{index:Number, body: String, author: String, date: { type: Date, default: Date.now }, ip:String ,deleted: Boolean}],
   author: String,
   date: { type: Date, default: Date.now },
+  deleted:Boolean
 });
 
 var Posts = mongoose.model('posts', posts);
@@ -80,6 +82,7 @@ router.post('/new', function (req, res, next) {
       title: req.body.title,
       body: req.body.body,
       image: req.body.image,
+      ip: req.ip,
       comments: [],
       author: decoded.username,
       date: Date.now()
@@ -118,13 +121,13 @@ router.post('/edit/:id', function (req, res, next) {
     decoded=jwt.verify(req.cookies.token, jwt_secret);
     Posts.findOne({ id: req.params.id }, (err, post) => {
       if(post.author===decoded.username){
-        post.title = req.body.title;
+        //post.title = req.body.title;
         post.body = req.body.body;
-        post.image = req.body.image;
+        //post.image = req.body.image;
         post.save();
-        res.redirect('/');
+        res.send('ok');
       }else{
-        res.redirect('/');
+        res.send('error');
       }
     });
   } catch(err){
@@ -142,6 +145,7 @@ router.post('/comment/:id/new',function(req,res,next){
         body: req.body.body,
         author: decoded.username,
         date: Date.now(),
+        ip: req.ip,
         deleted: false
       });
       console.log(post.comments);
@@ -164,7 +168,7 @@ router.get('/comment/:id/delete',function(req,res,next){
         }
       });
       post.save();
-      res.redirect('/view/'+req.params.id);
+      res.send('ok');
     });
   }catch(err){
     res.clearCookie("token");
@@ -238,6 +242,15 @@ router.get('/user', function (req, res, next) {
   }
 });
 
+router.get('/login',function(req,res,next){
+  try{
+    decoded=jwt.verify(req.cookies.token, jwt_secret);
+    res.redirect('/');
+  }catch(err){
+    res.render('login',{username:'',error:''});
+  }
+})
+
 router.post('/login', function (req, res, next) {
   var username = req.body['username'];
   var password = sha256(req.body['password'] + hash_salt);
@@ -245,17 +258,28 @@ router.post('/login', function (req, res, next) {
     if (user) {
       var token = jwt.sign({ username: username }, jwt_secret);
       res.cookie('token', token);
-      res.send('ok');
+      res.redirect('/');
     } else {
-      res.send('error');
+      res.render('login', { username: '', error: '帳號或密碼錯誤' });
     }
   });
 });
 
+router.get('/register',function(req,res,next){
+  try{
+    decoded=jwt.verify(req.cookies.token, jwt_secret);
+    res.redirect('/');
+  }catch(err){
+    res.render('register',{username:'',error:'',success:''});
+  }
+})
+
 router.post('/register', function (req, res, next) {
   Users.findOne({ username: req.body['username'] }, (err, user) => {
-    if (user) {
-      res.send("user exist");
+    if(req.body["password"]!==req.body["passwordchk"]){
+      res.render('register',{username:'',error:'密碼不一致'});
+    }else if (user) {
+      res.render('register',{username:'',error:'用戶已存在',success:''});
     } else {
       Users.create({
         username: req.body['username'],
@@ -263,9 +287,9 @@ router.post('/register', function (req, res, next) {
         posts: []
       }, (err, user) => {
         if (err) {
-          res.send("error");
+          res.render('register',{username:'',error:'???',success:''});
         } else {
-          res.send("register success");
+          res.render('register',{username:'',error:'',success:'註冊成功'})
         }
       });
     }

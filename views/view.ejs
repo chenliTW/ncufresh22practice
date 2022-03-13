@@ -2,121 +2,90 @@
 <html>
   <head>
     <title>留言板</title>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"
-    />
-    <link rel="stylesheet" href="/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/stylesheets/style.css" />
-    <script src="/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   </head>
-  <body>
+  <body class="bg-black sm:text-sm lg:text-2xl xl:text-2xl" style="font-family:'細明體';">
     <%- include('navbar.ejs') %>
-    <main class="container-md">
-      <div class="card" style="margin-bottom: 0px">
-        <div style="white-space: nowrap; font-size: x-large; font-weight: 200;padding-top: 7px;">
-          <img
-            height="30px"
-            width="30px"
-            src="https://teameowdev.files.wordpress.com/2016/04/teameow-e9a090e8a8ade9a0ade8b2bc.jpg?w=809"
-            alt=""
-            style="display: inline; font-weight: lighter;margin-bottom: 5px;"
-          />
-          <p style="display: inline"><%= post.author %></p>
-          <% if(post.author===username){ %>
-          <button class="btn btn-primary" style="position: absolute;right:145px;" onclick="location.href='/edit/<%= post.id %>'">編輯</button>
-          <button class="btn btn-danger" style="position: absolute;right:75px;" onclick="location.href='/delete/<%= post.id %>'">刪除</button>
-            <% } %>
+    <div class="flex top-12 relative lg:px-10 xl:px-16 ">
+      <span class="flex-initial text-white bg-gray-400 text-blue-900 px-3 w-18">
+        <div>作者</div>
+        <div>標題</div>
+        <div>時間</div>
+      </span>
+      <span class="flex-1 bg-blue-900 text-gray-400 px-2">
+        <div class="flex">
+          <span class="flex-1"><%= post.author %></span>
+          <span class="flex-initial w-auto">
+            <span class="bg-gray-400 px-2 text-blue-900">看板</span>
+            <span class="px-2">Gossiping(?</span>
+          </span>
         </div>
-        <h3 style="margin-top: 12px"><%= post.title %></h3>
-        <h5 style="font-weight: 200"><%= post.date %></h5>
-        <% if(post.title==='dQw4w9WgXcQ'){ %>
-          <img class="rick" src="<%= post.image %>" />
-        <% } else if (post.image !== '') { %>
-        <br />
-        <img src="<%= post.image %>" />
-        <% } %>
-        <pre style="margin-top: 10px;font-weight: 300;"><%= post.body %></pre>
+        <div class="flex"><span class="flex-1"><%= post.title %></span><% if(username==post.author){ %>
+          <span class="flex-initial w-42 pr-4">
+            <span id="bodyeditbtn" onclick="editbody()">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </span>
+            <span id="bodydeletebtn" onclick="deletepost(`<%= post.id %>`)">
+              <i class="fa-solid fa-xmark"></i>
+            </span>
+            <span id="bodysavebtn" onclick="savebody(`<%= post.id %>`)" hidden>
+              <i class="fa-regular fa-floppy-disk"></i>     
+            </span>
+          </span> <% } %>
+        </div>
+        <div><%= post.date %></div>
+      </span>
+    </div>
+    <br>
+    <div class="xl:px-16 px-12 sm:text-sm lg:text-xl text-clip overflow-hidden">
+      <pre id="body" class="text-white pt-12 pb-4"><%= post.body %></pre>
+      <textarea id="bodytextarea" class="bg-gray-300 text-black w-full mt-12" rows="10" hidden><%= post.body %></textarea>
+      <div class="text-white">
+        ---
       </div>
-      <div
-        class="card"
-        style="margin-top: 0px; background-color: #f5f5f5; margin-bottom: 0px"
-      >
-        共 <%= post.comments.length %> 則留言
-        <hr />
-        <% for (let i = 0; i < post.comments.length; ++i) { %>
-        <span style="white-space: nowrap; font-weight: 500;display: inline;width: 100%;">
-          <img
-            height="25px"
-            width="25px"
-            src="https://teameowdev.files.wordpress.com/2016/04/teameow-e9a090e8a8ade9a0ade8b2bc.jpg?w=809"
-            alt=""
-            style="display: inline;margin-bottom: 5px;"
-          />
-          <% if(post.comments[i].deleted===false){ %>
-          <p style="display: inline;"><%= post.comments[i].author %></p>
-          <% if(post.comments[i].author===username){ %>
-          <button class="btn btn-primary btn-sm" style="position: absolute;right:130px;" onclick="edit(<%=post.comments[i].index%>)" id="edit_btn<%=post.comments[i].index%>" >編輯</button>
-          <button class="btn btn-success btn-sm" style="position: absolute;right:130px;" onclick="save('<%=post.id%>',<%=post.comments[i].index%>)" id="save_btn<%=post.comments[i].index%>" hidden>儲存</button>
-          <button class="btn btn-danger btn-sm" style="position: absolute;right:75px;" onclick="location.href='/comment/<%=post.id%>/delete?index=<%=post.comments[i].index%>'">刪除</button>
+      <div class="text-green-600">
+        ※ 發信站: 批??實業坊(p??.cc), 來自: <%= post.ip %> (???)<br>
+        ※ 文章網址: <a id="post_url"></a>
+      </div>
+      <div>
+      <% for(let i=0;i<post.comments.length;++i){ %>
+        <% if(!post.comments[i].deleted){ %>
+          <% let tmp=((post.comments[i].body.length%25==0)?(post.comments[i].body.length/25-1):(post.comments[i].body.length/25))%>
+          <% for(let j=0;j<=tmp;++j){ %>
+          <div class="flex">
+            <span class="mr-3 flex-initial"><span class="text-white px-2">推</span><span class="text-yellow-300"><%= post.comments[i].author %>:</span></span>
+            <span class="text-yellow-500 flex-1">
+              <%= post.comments[i].body.substring(j*25,(j+1)*25) %>
+            </span>
+            <span class="flex-initial">
+              <% if(j==0&&post.comments[i].author===username){ %>
+                <span class="text-red-800" onclick="deletecomment(`<%= post.id %>`,`<%= post.comments[i].index%>`)">
+                  <i class="fa-solid fa-xmark"></i>
+                </span>
+              <% } %>
+              <span class="text-yellow-300 mx-3"><%= post.comments[i].ip %></span>
+              <span class="text-yellow-300"><%= post.comments[i].date.getMonth() %>/<%= post.comments[i].date.getDate() %></span>
+            </span>
+          </div>
           <% } %>
-        </span>
-        <form>
-        <p style="margin-left: 25px;margin-bottom: 0px;"><span id="span<%= post.comments[i].index%>"><%= post.comments[i].body %></span><textarea hidden id="textarea<%= post.comments[i].index%>" style="width: 100%;margin-top: 5px;border: 0;" name="body"><%= post.comments[i].body %></textarea><br>B<%= post.comments[i].index%> ．  <%= post.comments[i].date%></p>
-        </form>
-        <hr>
-        <% }else{ %>
-          <p style="display: inline;">這則留言已被刪除</p>
-        </span>
-        <form>
-        <p style="margin-left: 25px;margin-bottom: 0px;">已經刪除的內容就被刪除了<br>  <%= post.comments[i].date%></p>
-        </form>
-        <hr>
         <% } %>
-        <% } %>
+      <% } %>
       </div>
-      <form method="post" action="/comment/<%= post.id %>/new">
-      <div class="card" style="margin-top: 0px; background-color: #ffffff">
-        
-        <div style="white-space: nowrap;margin-bottom: 10px;">
-          
-        <img
-            height="25px"
-            width="25px"
-            src="https://teameowdev.files.wordpress.com/2016/04/teameow-e9a090e8a8ade9a0ade8b2bc.jpg?w=809"
-            alt=""
-            style="display: inline; font-weight: lighter;margin-bottom: 5px;"
-          />
-          <% if(username!==''){ %>
-          <p style="display: inline"><%= username %></p>
-          <% }else{ %>
-            <p style="display: inline">登入以留言</p>
-            <%}%>
-        </div>
-        
-        
-        <textarea style="border: 0px;" rows="4" placeholder="<% if(username!==''){ %>寫下你的留言<%}else{%>登入以留言<%}%>" name="body" <% if(username===''){ %>disabled<%}%> ></textarea>
-        <% if(username!==''){ %>
-        <button class="btn btn-success" style="position: relative;width: 70px;margin-right: 0px;margin-left: auto;margin-top: 10px;">留言</button>
-        <% }else{ %>
-          <button class="btn btn-success" style="position: relative;width: 150px;margin-right: 0px;margin-left: auto;margin-top: 10px;" disabled>登入以留言</button>
-        <% } %>
-        
-      </div>
-    </form>
-    </main>
+    </div>
+    <div class="h-20">
+
+    </div>
   </body>
 </html>
 
 <script>
 
-  
+  window.onload=function(){
+    document.getElementById("post_url").innerText=location.href;
+  }
+  /*
   async function save_to_db(id,index,body){
-    await fetch(`/comment/${id}/edit`,{
-            headers: {'Content-Type':'application/x-www-form-urlencoded'}, 
-            body: `index=${index}&body=${body}`,
-            method:'POST'
-        });
+    await 
   }
 
 
@@ -146,102 +115,64 @@
     savebtn.hidden=false;
     span.hidden=true;
     textarea.hidden=false;
+  }*/
+
+  function editbody(){
+    let bodytextarea=document.getElementById('bodytextarea');
+    let body=document.getElementById('body');
+
+    let bodydeletebtn=document.getElementById('bodydeletebtn');
+    let bodysavebtn=document.getElementById('bodysavebtn');
+    let bodyeditbtn=document.getElementById('bodyeditbtn');
+
+    body.hidden=true;
+    bodytextarea.hidden=false;
+
+    bodydeletebtn.hidden=true;
+    bodyeditbtn.hidden=true;   
+    bodysavebtn.hidden=false;
+     
+  }
+  
+  function savebody(id){
+    let bodytextarea=document.getElementById('bodytextarea');
+    let body=document.getElementById('body');
+
+    let bodydeletebtn=document.getElementById('bodydeletebtn');
+    let bodysavebtn=document.getElementById('bodysavebtn');
+    let bodyeditbtn=document.getElementById('bodyeditbtn');
+
+    body.hidden=false;
+    bodytextarea.hidden=true;
+
+    bodydeletebtn.hidden=false;
+    bodyeditbtn.hidden=false;   
+    bodysavebtn.hidden=true;
+
+    body.innerText=bodytextarea.value;
+
+    fetch(`/edit/${id}`,{
+            headers: {'Content-Type':'application/x-www-form-urlencoded'}, 
+            body: `body=${body.innerText}`,
+            method:'POST'
+        });
+
   }
 
-  
+  async function deletepost(id){
+    await fetch(`/delete/${id}`,{
+            headers: {'Content-Type':'application/x-www-form-urlencoded'}, 
+            method:'GET'
+        });
+    location.href="/";
+  }
+
+  async function deletecomment(id,index){
+    await fetch(`/comment/${id}/delete?index=${index}`,{
+            headers: {'Content-Type':'application/x-www-form-urlencoded'}, 
+            method:'GET'
+        });
+    location.reload();
+  }
 
 </script>
-<style>
-  .rick{
-    -moz-animation-duration: 0.75s;
-    -webkit-animation-duration: 0.75s;
-    animation-duration: 0.75s;
-    -moz-animation-name: rick;
-    -webkit-animation-name: rick;
-    animation-name: rick;
-    -moz-animation-iteration-count: infinite;
-    -webkit-animation-iteration-count: infinite;
-    animation-iteration-count: infinite;
-  }
-
-  @-moz-keyframes rick{
-    0% {
-      margin-right:15%;
-      margin-left:15%;
-    }
-
-    25%{
-      margin-right:0%;
-      margin-left:15%;
-    }
-
-    50% {
-      margin-right:15%;
-      margin-left:15%;
-    }
-
-    75% {
-      margin-right:15%;
-      margin-left:0%;
-    }
-
-    100% {
-      margin-right:15%;
-      margin-left:15%;
-    }
-  }
-
-  @-webkit-keyframes rick {
-    0% {
-      margin-right:15%;
-      margin-left:15%;
-    }
-
-    25%{
-      margin-right:0%;
-      margin-left:15%;
-    }
-
-    50% {
-      margin-right:15%;
-      margin-left:15%;
-    }
-
-    75% {
-      margin-right:15%;
-      margin-left:0%;
-    }
-
-    100% {
-      margin-right:15%;
-      margin-left:15%;
-    }
-  }
-
-  @keyframes rick {
-    0% {
-      margin-right:15%;
-      margin-left:15%;
-    }
-
-    25%{
-      margin-right:0%;
-      margin-left:15%;
-    }
-
-    50% {
-      margin-right:15%;
-      margin-left:15%;
-    }
-
-    75% {
-      margin-right:15%;
-      margin-left:0%;
-    }
-
-    100% {
-      margin-right:15%;
-      margin-left:15%;
-    }
-  }
-</style>
