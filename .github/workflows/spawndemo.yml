@@ -1,0 +1,57 @@
+name: UPD spawndemo
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Cancel Previous Runs
+      uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        access_token: ${{ github.token }}
+    - uses: actions/checkout@v2
+    - name: install tool
+      run: sudo apt install wget gnupg nodejs npm -y
+    - name: setup node
+      run: |
+        sudo npm install -g n
+        sudo n 16.13.1
+        npm install
+    - name: setup ngrok
+      run: |
+        wget "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.tgz"
+        tar zxvf ngrok-stable-linux-amd64.tgz
+        sudo chmod +x ./ngrok
+    - name: setup mongodb
+      run: |
+        wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+        echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+        sudo apt-get update
+        sudo apt-get install -y mongodb-org
+    - name: run all 
+      run: |
+        mkdir tmp
+        mongod --dbpath=./tmp &
+        ./ngrok authtoken ${{ secrets.NGORKAUTHTOKEN }}
+        ./ngrok http 3000 &
+      shell: bash
+    - name: Get URL
+      id: vars
+      run: curl -s localhost:4040/api/tunnels | jq -r .tunnels[0].public_url
+      shell: bash
+    - name: gen README.md
+      run: |
+        echo "Last Update Time: " > README.md
+        date >> README.md
+        echo `curl -s localhost:4040/api/tunnels | jq -r .tunnels[0].public_url` >> README.md
+    - name: push
+      run: |
+        git add README.md
+        git config --global user.email "actions-bot@le37.tw"
+        git config --global user.name "actions bot"
+        git commit -m "test"
+        git push -f
+    - name: oao
+      run: npm start
