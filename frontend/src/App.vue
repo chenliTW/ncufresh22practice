@@ -1,26 +1,40 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <Navbar :username="username" @change_page="change_page"/>
+  <Login v-if="stage==='Login'"/>
+  <Index v-if="stage==='Index'"/>
+  <Register v-if="stage==='Register'" />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Navbar from './components/Navbar.vue'
+import Login from './components/Login.vue'
+import Index from './components/Index.vue'
+import Register from './components/Register.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Navbar,
+    Login,
+    Index,
+    Register
+  },
+  methods:{
+    change_page(page){
+      this.stage = page;
+    }
+  },
+  data() {
+    return {
+      username: '',
+      stage: 'Index'
+    }
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  body{
+    background-color: #000000;
+  }
 </style>
