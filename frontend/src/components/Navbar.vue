@@ -11,7 +11,7 @@
         <div v-if="username !== ''">
           <span class="text-yellow-200 text-2xl fixed top-2 right-52" href="/" hidden>早安, {{username}} </span>
           <button class="bg-green-800 text-xl text-white py-1 px-4 rounded fixed top-2 mx-1 right-20" @click="change_page('Newpost')" >新文章</button>
-          <button class="bg-red-800 text-xl text-white py-1 px-4 rounded fixed top-2 right-2" @click="this.$emit('set_username','')">登出</button>
+          <button class="bg-red-800 text-xl text-white py-1 px-4 rounded fixed top-2 right-2" @click="this.$emit('set_token','')">登出</button>
         </div>
       </div>
     </nav>

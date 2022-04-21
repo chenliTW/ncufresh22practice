@@ -31,10 +31,9 @@ var posts = new mongoose.Schema({
     body: String,
     image: String,
     ip: String,
-    comments: [{index:Number, body: String, author: String, date: { type: Date, default: Date.now }, ip:String ,deleted: Boolean}],
+    comments: [{index:Number, body: String, author: String, date: { type: Date, default: Date.now }, ip:String }],
     author: String,
     date: { type: Date, default: Date.now },
-    deleted:Boolean
   });
   
 var Posts = mongoose.model('posts', posts);
@@ -49,7 +48,11 @@ var Users = mongoose.model('users', users);
 
 function isAuthed(req,res,next){
     try{
-        decoded = jwt.verify(req.body['token'], jwt_secret);
+        if(req.method=='POST'||req.method=='PUT'){
+          decoded = jwt.verify(req.body['token'], jwt_secret);
+        }else if(req.method=='DELETE'){
+          decoded = jwt.verify(req.query['token'], jwt_secret);
+        }
         res.locals.username=decoded['username'];
         next();
     }catch(err){
@@ -100,14 +103,11 @@ app.get(base_path+'/posts/list',function(req,res,next){
 
 app.get(base_path+'/posts/get',function(req,res,next){
   Posts.findOne({ id: req.query['id'] }, (err, post) => {
-    console.log(post)
     res.send({ post: post });
   });
 })
 
 app.post(base_path+'/posts/new',isAuthed,function(req,res,next){
-    console.log(req.body);
-
     let nid = uuidv4();
     Posts.create({
       id: nid,
@@ -127,8 +127,8 @@ app.post(base_path+'/posts/new',isAuthed,function(req,res,next){
     res.send({success:"new post created"});
 });
 
-app.put(base_path+'/posts/edit',isAuthed,function(req,res,next){
-    Posts.findOne({ id: req.body.id }, (err, post) => {
+app.put(base_path+'/posts/:id/edit',isAuthed,function(req,res,next){
+    Posts.findOne({ id: req.params.id }, (err, post) => {
         if(post.author===res.locals.username){
           post.body = req.body.body;
           post.save();
@@ -140,16 +140,17 @@ app.put(base_path+'/posts/edit',isAuthed,function(req,res,next){
 });
 
 app.delete(base_path+'/posts/:id/delete',isAuthed,function(req,res,next){
-    Posts.findOne({ id: req.body.id }, function (err, post) {
-        if (post.author === username) {
-          Posts.deleteOne({ id: req.body.id }, function (err, post) {
-            Users.findOne({ username: res.locals.username }, function (err, user) {
-              user.posts.splice(user.posts.indexOf(req.body.id), 1);
-              user.save();
-            });
+  Posts.findOne({ id: req.params.id }, function (err, post) {
+      if (post.author === res.locals.username) {
+        Posts.deleteOne({ id: req.params.id }, function (err, post) {
+          Users.findOne({ username: res.locals.username }, function (err, user) {
+            user.posts.splice(user.posts.indexOf(req.params.id), 1);
+            user.save();
+            res.send({success:'刪除成功'});
           });
-        }
-      });
+        });
+      }
+    });
 });
 
 app.post(base_path+'/posts/:id/comment/new',isAuthed,function(req,res,next){
@@ -167,5 +168,21 @@ app.post(base_path+'/posts/:id/comment/new',isAuthed,function(req,res,next){
       });
 });
 
+app.delete(base_path+'/posts/:id/comment/:index/delete',isAuthed,function(req,res,next){
+  Posts.findOne({ id: req.params.id }, function (err, post) {
+      let tobedeleted=-1;
+      for(let i=0;i<post.comments.length;i++){
+        if(post.comments[i].index==req.params.index && post.comments[i].author===res.locals.username){
+          tobedeleted=i;
+          break;
+        }
+      }
+      if(tobedeleted>=0){
+        post.comments.splice(tobedeleted,1);
+      }
+      post.save();
+      res.send({success:'刪除成功'});
+    });
+});
 
 app.listen(port);

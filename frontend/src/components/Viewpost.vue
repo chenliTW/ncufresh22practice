@@ -15,13 +15,13 @@
         </div>
         <div class="flex"><span class="flex-1">{{ post.title }}</span>
           <span v-if="username===post.author" class="flex-initial w-42 pr-4">
-            <span id="bodyeditbtn" class="px-1">
+            <span v-if="mode==='view'" id="bodyeditbtn" class="px-1" @click="this.mode='edit'">
               <font-awesome-icon icon="pen-to-square" />
             </span>
-            <span id="bodydeletebtn" class="px-1">
+            <span v-if="mode==='view'" id="bodydeletebtn" class="px-1" @click="delete_post(post.id)">
               <font-awesome-icon icon="xmark" />
             </span>
-            <span id="bodysavebtn" class="px-1">
+            <span v-if="mode==='edit'" id="bodysavebtn" class="px-1" @click="put_post()">
               <font-awesome-icon icon="floppy-disk" />     
             </span>
           </span>
@@ -32,8 +32,8 @@
     
     <br>
     <div class="xl:px-16 px-12 sm:text-sm lg:text-xl text-clip overflow-hidden">
-      <pre id="body" class="text-white pt-12 pb-4">{{ post.body }}</pre>
-      <textarea id="bodytextarea" class="bg-gray-300 text-black w-full mt-12" rows="10" v-model="post.body" hidden></textarea>
+      <pre v-if="mode!=='edit'" class="text-white pt-12 pb-4">{{ post.body }}</pre>
+      <textarea v-if="mode==='edit'" id="bodytextarea" class="bg-gray-300 text-black w-full mt-12" rows="10" v-model="post.body"></textarea>
       <div class="text-white">
         ---
       </div>
@@ -48,7 +48,7 @@
             {{ comment.body }}
         </span>
         <span class="flex-initial">
-            <span v-if="comment.author===username" class="text-red-800">
+            <span v-if="comment.author===username" class="text-red-800" @click="delete_comment(comment.index)">
                 <font-awesome-icon icon="xmark" />
             </span>
             
@@ -71,17 +71,54 @@ export default {
     name:"View-post",
     props:{
         post_id:String,
-        username:String
+        username:String,
+        token:String
     },
     data(){
         return{
-            post:"",       
+            post:"",  
+            mode:"view"    
         }
     },
     mounted(){
         axios.get('http://localhost:8000/posts/get?id='+this.post_id)
         .then(response => (this.post = response.data.post))
         .catch(error => console.log(error))
+    },
+    methods:{
+      delete_post(id){
+        axios.delete('http://localhost:8000/posts/'+id+'/delete?token='+this.token)
+        .then(response => {
+          console.log(response.data);
+          if(response.data.success){
+            this.$emit('change_page','Index');
+          }
+        })
+        .catch(error => console.log(error))
+      },
+      delete_comment(index){
+        axios.delete('http://localhost:8000/posts/'+this.post_id+'/comment/'+index+'/delete?token='+this.token)
+        .then(response => {
+          console.log(response.data);
+          if(response.data.success){
+            this.post.comments.splice(index,1);
+          }
+        })
+        .catch(error => console.log(error))
+      },
+      put_post(){
+        axios.put('http://localhost:8000/posts/'+this.post_id+'/edit',{
+          token:this.token,
+          body:this.post.body
+        })
+        .then(response => {
+          console.log(response.data);
+          if(response.data.success){
+            this.mode = "view";
+          }
+        })
+        .catch(error => console.log(error))
+      }
     }
 }
 </script>

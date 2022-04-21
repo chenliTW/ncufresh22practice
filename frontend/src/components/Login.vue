@@ -43,7 +43,6 @@ export default {
             .then(response => {
                 if(response.data.success){
                     this.$emit('set_token', response.data.token);
-                    this.$emit('set_username', this.username);
                     this.$emit('change_page', 'Index');
                 }else{
                     this.error=response.data.error;
