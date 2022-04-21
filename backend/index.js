@@ -63,6 +63,8 @@ app.post(base_path+'/users/login',function(req,res,next){
     Users.findOne({ username: username, password: password }, function (err, user) {
         if (user) {
             var token = jwt.sign({ username: username }, jwt_secret);
+            res.clearCookie("token");
+            res.cookie('token', token);
             res.send({success:"user login",token:token})
         } else {
             res.send({error:"帳密錯誤"});

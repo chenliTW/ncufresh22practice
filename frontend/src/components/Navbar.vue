@@ -43,12 +43,6 @@ export default {
     token: String,
     stage: String
   },
-  BeforeUnmount(){
-    alert('unmount')
-    if(this.stage === 'reload'){
-      this.change_page('Viewpost')
-    }
-  },
   mounted (){
     this.update_clock();
     setInterval(this.update_clock, 1000);
@@ -82,7 +76,7 @@ export default {
       })
       .then(() => {
         this.comment='';
-        this.change_page('reload')
+        this.change_page('reload_Viewpost')
       })
       .catch(error => console.log(error));
     }

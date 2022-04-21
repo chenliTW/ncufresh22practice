@@ -15,14 +15,14 @@
         </div>
         <div class="flex"><span class="flex-1">{{ post.title }}</span>
           <span v-if="username===post.author" class="flex-initial w-42 pr-4">
-            <span id="bodyeditbtn" onclick="editbody()">
-              <i class="fa-solid fa-pen-to-square"></i>
+            <span id="bodyeditbtn" class="px-1">
+              <font-awesome-icon icon="pen-to-square" />
             </span>
-            <span id="bodydeletebtn" onclick="deletepost(`{{ post.id }}`)">
-              <i class="fa-solid fa-xmark"></i>
+            <span id="bodydeletebtn" class="px-1">
+              <font-awesome-icon icon="xmark" />
             </span>
-            <span id="bodysavebtn" onclick="savebody(`{{ post.id }}`)" hidden>
-              <i class="fa-regular fa-floppy-disk"></i>     
+            <span id="bodysavebtn" class="px-1">
+              <font-awesome-icon icon="floppy-disk" />     
             </span>
           </span>
         </div>
@@ -49,8 +49,9 @@
         </span>
         <span class="flex-initial">
             <span v-if="comment.author===username" class="text-red-800">
-                <i class="fa-solid fa-xmark"></i>
+                <font-awesome-icon icon="xmark" />
             </span>
+            
             <span class="text-yellow-300 mx-3">{{ comment.ip }}</span>
             <span class="text-yellow-300">{{ comment.date.split('.')[0] }}</span>
         </span>

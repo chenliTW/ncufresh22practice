@@ -26,6 +26,14 @@ export default {
     Newpost,
     Viewpost
   },
+  mounted(){
+    alert(document.cookie)
+  },
+  updated(){
+    if(this.stage==='reload_Viewpost'){
+      this.stage='Viewpost';
+    }
+  },
   methods:{
     change_page(page){
       this.stage = page;
@@ -35,6 +43,8 @@ export default {
     },
     set_token(token){
       this.token = token;
+      document.cookie = 'token='+token;
+      alert(document.cookie)
     },
     view_post(pid){
       this.post_id = pid;
