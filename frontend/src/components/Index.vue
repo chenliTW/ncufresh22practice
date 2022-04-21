@@ -4,7 +4,7 @@
             <div class="m-2 p-2 flex" style="background-color: rgb(17, 17, 17);">
                 <div class="inline text-green-400 text-xl w-8 flex-initial">{{post.comments.length}}</div>
                 <div class="inline flex-1">
-                    <a id="title<%=i%>" href="/view/<%= posts[i].id %>" >
+                    <a id="title<%=i%>" class="bg-white text-black text-xl" @click="view_post(post.id)" >
                         [問卦] {{ post.title }}
                     </a>
                     <br>
@@ -16,6 +16,9 @@
 </template>
 
 <script>
+
+import axios from 'axios'
+
 export default {
     name:'In-dex',
     data(){
@@ -23,13 +26,16 @@ export default {
             posts: [],
         }
     },
-    /*mounted:{
-        function(){
+    mounted(){
         axios.get('http://localhost:8000/posts/list')
         .then(response => (this.posts = response.data))
         .catch(error => console.log(error))
+    },
+    methods:{
+        view_post(id){
+            this.$emit('view_post', id)
         },
-    }*/
+    }
 }
 </script>
 
