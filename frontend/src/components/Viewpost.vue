@@ -89,7 +89,6 @@ export default {
       delete_post(id){
         axios.delete('http://localhost:8000/posts/'+id+'/delete?token='+this.token)
         .then(response => {
-          console.log(response.data);
           if(response.data.success){
             this.$emit('change_page','Index');
           }
@@ -99,9 +98,9 @@ export default {
       delete_comment(index){
         axios.delete('http://localhost:8000/posts/'+this.post_id+'/comment/'+index+'/delete?token='+this.token)
         .then(response => {
-          console.log(response.data);
           if(response.data.success){
             this.post.comments.splice(index,1);
+            this.$emit('change_page','reload_Viewpost');
           }
         })
         .catch(error => console.log(error))
@@ -112,7 +111,6 @@ export default {
           body:this.post.body
         })
         .then(response => {
-          console.log(response.data);
           if(response.data.success){
             this.mode = "view";
           }
