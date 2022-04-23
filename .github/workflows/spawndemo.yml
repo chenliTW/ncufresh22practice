@@ -1,24 +1,43 @@
 name: UPD spawndemo
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "0,30 * * * *"
   workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
+    - name: check to homework3 branch
+      run: |
+        git checkout homework3
+    - name: install tool
+      run: sudo apt install wget gnupg nodejs npm nginx -y
+    - name: setup nginx
+      run: |
+        sudo mkdir -p /var/www/html/
+        sudo cat /etc/nginx/sites-enabled/default
+        sudo cp ./nginx.conf /etc/nginx/sites-enabled/default
+        sudo service nginx restart
     - name: Cancel Previous Runs
       uses: styfle/cancel-workflow-action@0.9.1
       with:
         access_token: ${{ github.token }}
-    - uses: actions/checkout@v2
-    - name: install tool
-      run: sudo apt install wget gnupg nodejs npm -y
     - name: setup node
       run: |
         sudo npm install -g n
         sudo n 16.13.1
+        sudo npm install -g nodemon
+        cd backend
         npm install
+        cd ../frontend
+        npm install
+    - name: build vue and deploy
+      run: |
+        cd ./frontend
+        npm run build
+        sudo rm -rf /var/www/html/*
+        sudo cp -r ./dist/* /var/www/html/
     - name: setup ngrok
       run: |
         wget "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.tgz"
@@ -32,10 +51,10 @@ jobs:
         sudo apt-get install -y mongodb-org
     - name: run all 
       run: |
-        mkdir tmp
-        mongod --dbpath=./tmp &
+        mkdir db
+        mongod --dbpath=./db &
         ./ngrok authtoken ${{ secrets.NGORKAUTHTOKEN }}
-        ./ngrok http 3000 &
+        ./ngrok http 80 &
       shell: bash
     - name: Get URL
       id: vars
@@ -54,4 +73,6 @@ jobs:
         git commit -m "test"
         git push -f
     - name: oao
-      run: npm start
+      run: |
+        cd backend
+        nodemon index.js

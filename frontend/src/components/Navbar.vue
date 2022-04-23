@@ -69,7 +69,7 @@ export default {
         alert('請輸入留言');
         return;
       }
-      axios.post('http://localhost:8000/posts/'+this.post_id+'/comment/new',{
+      axios.post(this.API+'/posts/'+this.post_id+'/comment/new',{
         token: this.token,
         body: this.comment,
         username: this.username,

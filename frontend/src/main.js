@@ -9,4 +9,8 @@ library.add(faPhone,faXmark,faFloppyDisk,faPenToSquare);
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-createApp(App).component("font-awesome-icon", FontAwesomeIcon).mount('#app')
+const app=createApp(App)
+
+app.config.globalProperties.API = '/api';
+
+app.component("font-awesome-icon", FontAwesomeIcon).mount('#app')

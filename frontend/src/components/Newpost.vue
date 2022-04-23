@@ -39,7 +39,7 @@ export default {
     },
     methods:{
         newpost(){
-            axios.post('http://localhost:8000/posts/new', {
+            axios.post(this.API+'/posts/new', {
                 title: this.title,
                 body: this.body,
                 token: this.token

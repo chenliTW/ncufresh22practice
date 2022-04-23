@@ -46,7 +46,7 @@ export default {
                 this.error='密碼不一致';
                 return;
             }
-            axios.post('http://localhost:8000/users/new', {
+            axios.post(this.API+'/users/new', {
                 username: this.username,
                 password: this.password
             })

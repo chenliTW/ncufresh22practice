@@ -28,7 +28,7 @@ export default {
         }
     },
     mounted(){
-        axios.get('http://localhost:8000/posts/list')
+        axios.get(this.API+'/posts/list')
         .then(response => {
             this.posts = response.data;
             this.mouseon = new Array(this.posts.length).fill(false)

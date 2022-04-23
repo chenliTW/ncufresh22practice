@@ -81,22 +81,27 @@ export default {
         }
     },
     mounted(){
-        axios.get('http://localhost:8000/posts/get?id='+this.post_id)
-        .then(response => (this.post = response.data.post))
-        .catch(error => console.log(error))
+        this.update_post();
     },
     methods:{
+      update_post(){
+        axios.get(this.API+'/posts/get?id='+this.post_id)
+        .then(response => (this.post = response.data.post))
+        .catch(error => console.log(error))
+      },
       delete_post(id){
-        axios.delete('http://localhost:8000/posts/'+id+'/delete?token='+this.token)
+        axios.delete(this.API+'/posts/'+id+'/delete?token='+this.token)
         .then(response => {
           if(response.data.success){
-            this.$emit('change_page','Index');
+            axios.get(this.API+'/posts/get?id='+this.post_id)
+            .then(response => (this.post.comments = response.data.post.comments))
+            .catch(error => console.log(error))
           }
         })
         .catch(error => console.log(error))
       },
       delete_comment(index){
-        axios.delete('http://localhost:8000/posts/'+this.post_id+'/comment/'+index+'/delete?token='+this.token)
+        axios.delete(this.API+'/posts/'+this.post_id+'/comment/'+index+'/delete?token='+this.token)
         .then(response => {
           if(response.data.success){
             this.post.comments.splice(index,1);
@@ -106,7 +111,7 @@ export default {
         .catch(error => console.log(error))
       },
       put_post(){
-        axios.put('http://localhost:8000/posts/'+this.post_id+'/edit',{
+        axios.put(this.API+'/posts/'+this.post_id+'/edit',{
           token:this.token,
           body:this.post.body
         })
