@@ -96,6 +96,7 @@ export default {
             axios.get(this.API+'/posts/get?id='+this.post_id)
             .then(response => (this.post.comments = response.data.post.comments))
             .catch(error => console.log(error))
+            this.$emit('change_page','Index');
           }
         })
         .catch(error => console.log(error))
