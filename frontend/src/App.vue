@@ -17,8 +17,6 @@ import Newpost from './components/Newpost.vue'
 import Viewpost from './components/Viewpost.vue'
 
 export default {
-
-
   name: 'App',
   components: {
     Navbar,
