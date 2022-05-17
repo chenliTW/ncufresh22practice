@@ -21,7 +21,7 @@ import Viewpost from './components/Viewpost.vue'
 export default {
   name: 'App',
   provide:{
-    API:''
+    API:'/api'
   },
   components:{
     Navbar,
