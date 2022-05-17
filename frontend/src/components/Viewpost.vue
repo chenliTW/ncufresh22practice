@@ -15,7 +15,7 @@
         </div>
         <div class="flex"><span class="flex-1">{{ post.title }}</span>
           <span v-if="username===post.author" class="flex-initial w-42 pr-4">
-            <span v-if="mode==='view'" id="bodyeditbtn" class="px-1" @click="this.mode='edit'">
+            <span v-if="mode==='view'" id="bodyeditbtn" class="px-1" @click="change_mode('edit')">
               <font-awesome-icon icon="pen-to-square" />
             </span>
             <span v-if="mode==='view'" id="bodydeletebtn" class="px-1" @click="delete_post(post.id)">
@@ -65,64 +65,73 @@
 
 <script>
 
+import {onMounted, ref,inject} from "vue";
+
 import axios from 'axios'
 
 export default {
     name:"View-post",
-    props:{
-        post_id:String,
-        username:String,
-        token:String
-    },
-    data(){
-        return{
-            post:"",  
-            mode:"view"    
-        }
-    },
-    mounted(){
-        this.update_post();
-    },
-    methods:{
-      update_post(){
-        axios.get(this.API+'/posts/get?id='+this.post_id)
-        .then(response => (this.post = response.data.post))
+    props:['post_id','username','token'],
+    emits:['change_page'],  
+    setup(props,{emit}){
+      const post=ref("");
+      const mode=ref("view");
+
+      const API=inject('API');
+
+      onMounted(()=>{
+        update_post();
+      })
+
+      function update_post(){
+        axios.get(API+'/posts/get?id='+props.post_id)
+        .then(response => (post.value = response.data.post))
         .catch(error => console.log(error))
-      },
-      delete_post(id){
-        axios.delete(this.API+'/posts/'+id+'/delete?token='+this.token)
+      }
+      function delete_post(id){
+        axios.delete(API+'/posts/'+id+'/delete?token='+props.token)
         .then(response => {
           if(response.data.success){
-            axios.get(this.API+'/posts/get?id='+this.post_id)
-            .then(response => (this.post.comments = response.data.post.comments))
+            axios.get(API+'/posts/get?id='+props.post_id)
+            .then(response => (post.value.comments = response.data.post.comments))
             .catch(error => console.log(error))
-            this.$emit('change_page','Index');
-          }
-        })
-        .catch(error => console.log(error))
-      },
-      delete_comment(index){
-        axios.delete(this.API+'/posts/'+this.post_id+'/comment/'+index+'/delete?token='+this.token)
-        .then(response => {
-          if(response.data.success){
-            this.post.comments.splice(index,1);
-            this.$emit('change_page','reload_Viewpost');
-          }
-        })
-        .catch(error => console.log(error))
-      },
-      put_post(){
-        axios.put(this.API+'/posts/'+this.post_id+'/edit',{
-          token:this.token,
-          body:this.post.body
-        })
-        .then(response => {
-          if(response.data.success){
-            this.mode = "view";
+            emit('change_page','Index');
           }
         })
         .catch(error => console.log(error))
       }
+      function delete_comment(index){
+        axios.delete(API+'/posts/'+props.post_id+'/comment/'+index+'/delete?token='+props.token)
+        .then(response => {
+          if(response.data.success){
+            post.value.comments.splice(index,1);
+            emit('change_page','reload_Viewpost');
+          }
+        })
+        .catch(error => console.log(error))
+      }
+      function put_post(){
+        axios.put(API+'/posts/'+props.post_id+'/edit',{
+          token:props.token,
+          body:post.value.body
+        })
+        .then(response => {
+          if(response.data.success){
+            mode.value = "view";
+          }
+        })
+        .catch(error => console.log(error))
+      }
+
+      function change_mode(new_mode){
+        mode.value=new_mode;
+      }
+
+      return {
+        post,mode,
+        delete_post,delete_comment,put_post,change_mode
+      }
+
     }
 }
 </script>

@@ -14,6 +14,5 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const app=createApp(App)
 
-app.config.globalProperties.API = 'http://127.0.0.1:8000';
 
 app.component("font-awesome-icon", FontAwesomeIcon).mount('#app')

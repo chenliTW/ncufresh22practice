@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: check to homework3 branch
+    - name: check to migrate2composition branch
       run: |
-        git checkout homework3
+        git checkout migrate2composition
     - name: install tool
       run: sudo apt install wget gnupg nodejs npm nginx -y
     - name: setup nginx

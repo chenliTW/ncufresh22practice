@@ -24,39 +24,44 @@
 
 <script>
 
+import {ref,inject} from "vue"
+
 import axios from 'axios'
 
 export default {
     name:'New-post',
-    props:{
-        token:String
-    },
-    data(){
-        return {
-            title: '',
-            body: '',
-        }
-    },
-    methods:{
-        newpost(){
-            axios.post(this.API+'/posts/new', {
-                title: this.title,
-                body: this.body,
-                token: this.token
-            })
-            .then(response => {
-                if(response.data.success){
-                    this.$emit('change_page', 'Index');
-                }else{
-                    alert(response.data.error);
-                    this.error=response.data.error;
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            })
-        },
+    props:['token'],
+    emits:['change_page'],
+    setup(props,{emit}){
+      const title=ref("");
+      const body=ref("");
+
+      const API=inject('API');
+
+      function newpost(){
+        axios.post(API+'/posts/new', {
+            title: title.value,
+            body: body.value,
+            token: props.token
+        })
+        .then(response => {
+            if(response.data.success){
+                emit('change_page', 'Index');
+            }else{
+                alert(response.data.error);
+                //error=response.data.error;
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        })
+      }
+      return {
+        title,body,
+        newpost
+      }
     }
+    
 }
 </script>
 

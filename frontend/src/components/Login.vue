@@ -23,35 +23,41 @@
 
 <script>
 
+import {ref,inject} from "vue";
+
 import axios from 'axios';
 
 export default {
     name:'Log-in',
-    data(){
-        return {
-            username: '',
-            password: '',
-            error:''
-        }
-    },
-    methods:{
-        login(){
-            axios.post(this.API+'/users/login', {
-                username: this.username,
-                password: this.password,
+    emits:['set_token','change_page'],
+    setup(props,{ emit }){
+        const username=ref("");
+        const password=ref("");
+        const error=ref("");
+
+        const API=inject('API');
+
+        function login(){
+            axios.post(API+'/users/login', {
+                username: username.value,
+                password: password.value,
             })
             .then(response => {
                 if(response.data.success){
-                    this.$emit('set_token', response.data.token);
-                    this.$emit('change_page', 'Index');
+                    emit('set_token', response.data.token);
+                    emit('change_page', 'Index');
                 }else{
-                    this.error=response.data.error;
+                    error.value=response.data.error;
                 }
             })
             .catch(error => {
                 console.log(error);
             })
-        },
+        }
+
+        return {username,password,
+                login
+                }
     }
 }
 </script>

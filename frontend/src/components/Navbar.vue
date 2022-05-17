@@ -33,53 +33,60 @@
 
 <script>
 
+import {onMounted, ref,inject} from "vue";
+
 import axios from 'axios'
 
 export default {
   name: 'Nav-bar',
-  props: {
-    username: String,
-    post_id: String,
-    token: String,
-    stage: String
-  },
-  mounted (){
-    this.update_clock();
-    setInterval(this.update_clock, 1000);
-  },
-  data(){
-    return {
-      time: '',
-      comment: '',
-    }
-  },
-  methods:{
-    update_clock(){
+  props: ['username','post_id','token','stage'],
+  emits: ['change_page'],
+  setup(props,{ emit }){
+    const time=ref("");
+    const comment=ref("");
+
+    const API=inject('API');
+
+    function update_clock(){
       let clock = new Date();
       let hour = clock.getHours();
       let minute = clock.getMinutes();
       let second = clock.getSeconds();
-      this.time= hour + ":" + minute + ":" + second;
-    },
-    change_page(page){
-      this.$emit('change_page', page);
-    },
-    newcomment(){
-      if(this.comment === ''){
+      time.value= hour + ":" + minute + ":" + second;
+    }
+
+    function change_page(page){
+      emit('change_page', page);
+    }
+
+    function newcomment(){
+      if(comment.value === ''){
         alert('請輸入留言');
         return;
       }
-      axios.post(this.API+'/posts/'+this.post_id+'/comment/new',{
-        token: this.token,
-        body: this.comment,
-        username: this.username,
+
+      axios.post(API+'/posts/'+props.post_id+'/comment/new',{
+        token: props.token,
+        body: comment.value,
+        username: props.username
       })
       .then(() => {
-        this.comment='';
-        this.change_page('reload_Viewpost')
+        comment.value='';
+        change_page('reload_Viewpost')
       })
       .catch(error => console.log(error));
     }
+
+    onMounted(()=>{
+      update_clock();
+      setInterval(update_clock,1000);
+    })
+
+    return {
+      time,comment,
+      change_page,newcomment
+    }
+
   }
 }
 </script>

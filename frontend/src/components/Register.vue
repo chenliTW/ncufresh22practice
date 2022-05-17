@@ -28,36 +28,43 @@
 
 <script>
 
+import {ref,inject} from "vue";
+
 import axios from 'axios';
 
 export default {
     name:"regis-ter",
-    data(){
-        return {
-            username: '',
-            password: '',
-            password_chk: '',
-            error:''
-        }
-    },
-    methods:{
-        register(){
-            if(this.password != this.password_chk){
-                this.error='密碼不一致';
+    emits:['change_page'],
+    setup(props,{emit}){
+        const username=ref("");
+        const password=ref("");
+        const password_chk=ref("");
+        const error=ref("");
+
+        const API=inject('API');
+
+        function register(){
+            if(password.value != password_chk.value){
+                error.value='密碼不一致';
                 return;
             }
-            axios.post(this.API+'/users/new', {
-                username: this.username,
-                password: this.password
+            axios.post(API+'/users/new', {
+                username: username.value,
+                password: password.value
             })
             .then(response => {
                 if(response.data.success){
-                    this.$emit('change_page', 'Login');
+                    emit('change_page', 'Login');
                 }else{
-                    this.error=response.data.error;
+                    error.value=response.data.error;
                 }
             })
             .catch(error => console.log(error));
+        }
+
+        return {
+            username,password,password_chk,error,
+            register
         }
     }
 }

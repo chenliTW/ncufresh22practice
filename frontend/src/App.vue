@@ -5,10 +5,12 @@
   <Register v-if="stage==='Register'" @change_page="change_page"/>
   <Newpost v-if="stage==='Newpost'" :token="token" @change_page="change_page"/>
   <Viewpost v-if="stage==='Viewpost'" :post_id="post_id" :username="username" :token="token" @change_page="change_page"/>
-
 </template>
 
 <script>
+
+import {ref,onMounted,onUpdated} from "vue";
+
 import Navbar from './components/Navbar.vue'
 import Login from './components/Login.vue'
 import Index from './components/Index.vue'
@@ -18,7 +20,10 @@ import Viewpost from './components/Viewpost.vue'
 
 export default {
   name: 'App',
-  components: {
+  provide:{
+    API:''
+  },
+  components:{
     Navbar,
     Login,
     Index,
@@ -26,49 +31,56 @@ export default {
     Newpost,
     Viewpost
   },
-  data() {
-    return {
-      username: '',
-      token: '',
-      stage: 'Index',
-      post_id: '',
+  setup(){
+
+    const username=ref("");
+    const token=ref("");
+    const stage=ref("Index");
+    const post_id=ref("");
+    
+    function change_page(page){
+      stage.value = page;
     }
-  },
-  mounted(){
-    this.set_username();
-  },
-  updated(){
-    if(this.stage==='reload_Viewpost'){
-      this.stage='Viewpost';
-    }else if(this.stage!=='Viewpost'){
-      this.post_id='';
+
+    function set_username(){
+      try{
+        token.value=document.cookie.split('token=')[1].split(';')[0];
+        username.value=JSON.parse(atob(token.value.split('.')[1])).username;
+      }catch(e){
+        token.value='';
+        username.value='';
+      }
     }
-    if(this.stage==='reload_Index'){
-      this.stage='Index';
+
+    function set_token(_token){
+      token.value = _token;
+      document.cookie = 'token='+_token+';';
+      set_username();
+    }
+
+    function view_post(pid){
+      post_id.value = pid;
+      stage.value = 'Viewpost';
     }
     
-  },
-  methods:{
-    change_page(page){
-      this.stage = page;
-    },
-    set_username(){
-      try{
-        this.token=document.cookie.split('token=')[1].split(';')[0];
-        this.username=JSON.parse(atob(this.token.split('.')[1])).username;
-      }catch(e){
-        this.token='';
-        this.username='';
+    onMounted(()=>{
+      set_username();
+    });
+    
+    onUpdated(()=>{
+      if(stage.value==='reload_Viewpost'){
+        stage.value='Viewpost';
+      }else if(stage.value!=='Viewpost'){
+        post_id.value='';
       }
-    },
-    set_token(token){
-      this.token = token;
-      document.cookie = 'token='+token+';';
-      this.set_username();
-    },
-    view_post(pid){
-      this.post_id = pid;
-      this.stage = 'Viewpost';
+      if(stage.value==='reload_Index'){
+        stage.value='Index';
+      }
+    });
+
+    return {
+      username,token,stage,post_id,
+      change_page,set_token,view_post
     }
   }
 }
