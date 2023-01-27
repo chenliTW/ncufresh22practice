@@ -1,7 +1,7 @@
 name: UPD spawndemo
 on:
-  schedule:
-    - cron: "0,30 * * * *"
+  #schedule:
+  #  - cron: "0,30 * * * *"
   workflow_dispatch:
 jobs:
   build:
